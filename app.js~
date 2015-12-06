@@ -1,0 +1,86 @@
+var http = require('http');
+var fs = require('fs');
+var formidable = require("formidable");
+var util = require('util');
+var esprima = require('esprima');
+var estraverse = require('estraverse');
+
+var server = http.createServer(function (req, res) {
+    if (req.method.toLowerCase() == 'get') {
+        displayForm(res);
+    } else if (req.method.toLowerCase() == 'post') {
+        //processAllFieldsOfTheForm(req, res);
+        processFormFieldsIndividual(req, res);
+    }
+});
+
+function displayForm(res) {
+    fs.readFile('form.html', function (err, data) {
+        res.writeHead(200, {
+            'Content-Type': 'text/html',
+                'Content-Length': data.length
+        });
+        res.write(data);
+        res.end();
+    });
+}
+
+function processAllFieldsOfTheForm(req, res) {
+    var form = new formidable.IncomingForm();
+
+    form.parse(req, function (err, fields, files) {
+        //Store the data from the fields in your data store.
+        //The data store could be a file or database or any other store based
+        //on your application.
+        res.writeHead(200, {
+            'content-type': 'text/plain'
+        });
+        res.write('received the data:\n\n');
+        res.end(util.inspect({
+            fields: fields,
+            files: files
+        }));
+    });
+}
+
+function processFormFieldsIndividual(req, res) {
+    //Store the data from the fields in your data store.
+    //The data store could be a file or database or any other store based
+    //on your application.
+    var fields = [];
+    var form = new formidable.IncomingForm();
+    form.on('field', function (field, value) {
+        console.log(field);
+        console.log(value);
+        fields[field] = value;
+    	
+    });
+
+
+    form.on('end', function () {
+        res.writeHead(200, {
+            'content-type': 'text/plain'
+        });
+        res.write('received the data:\n\n');
+	res.write(fields.length);
+        res.end(util.inspect({
+            fields: fields
+        }));
+    });
+    form.parse(req);
+
+	var ast = esprima.parse('var answer = 42');
+	estraverse.traverse(ast, {
+  		enter: function(node){
+    			if (node.type === 'AssignmentExpression'){
+      			console.log('Encountered assignment to', node.left.name);
+    			}
+  		}
+	});
+
+	console.log(JSON.stringify(ast, null, 4)); 
+}
+
+
+server.listen(8888, '127.0.0.1');
+console.log('Server running at http://127.0.0.1:8888');
