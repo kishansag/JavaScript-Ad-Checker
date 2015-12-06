@@ -1,4 +1,4 @@
-Javascript Advertisement Filter
+Javascript Ad-checker
 
 This project was created as a part of a course on Web Technologies. It is an implementation of the research paper "An Approach for Identifying JavaScript-loaded Advertisements through Static Program Analysis" by Caitlin R. Orr, Arun Chauhan, Minaxi Gupta, Christopher J. Frisz and Christopher W. Dunn.
 
